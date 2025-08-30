@@ -1,0 +1,4 @@
+^\.git$
+^\.gitignore$
+^README\.md$
+fish/.config/fish/fish_variables
