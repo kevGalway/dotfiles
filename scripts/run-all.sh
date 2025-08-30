@@ -6,6 +6,7 @@ ROOT_DIR="$(cd -- "$(dirname "$0")/.." && pwd)"
 steps=(
   "00-bootstrap-arch.sh"
   "02-install-extra.sh"
+  "03-firewall.sh"
   "05-prune-defaults.sh"
   "10-stow.sh"
   "15-git-setup.sh"
