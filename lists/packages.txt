@@ -1,0 +1,2 @@
+# Browsers
+firefox-developer-edition
