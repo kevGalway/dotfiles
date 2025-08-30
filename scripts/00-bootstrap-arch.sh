@@ -7,11 +7,12 @@ if ! sudo -v; then
 fi
 
 if ! command -v pacman >/dev/null 2>&1 || [ ! -f /etc/arch-release ]; then
-  err "This bootstrap is for Arch/Omarchy only."
+  echo "This bootstrap is for Arch/Omarchy only." >&2
+  exit 1
 fi
 
 echo "Installing base packages"
-sudo pacman -Sy --needed git stow tmux fish starship zoxide fzf ripgrep bat neovim reflector github-cli
+sudo pacman -Syu --needed git stow tmux fish starship zoxide fzf ripgrep bat neovim reflector github-cli
 
 echo "==> Refreshing mirrors with reflector"
 sudo reflector --country --age 48 --protocol https --sort rate --save /etc/pacman.d/mirrorlist || true
