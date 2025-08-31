@@ -9,7 +9,9 @@ steps=(
   "03-firewall.sh"
   "05-prune-defaults.sh"
   "10-stow.sh"
+  "12-mise.sh"
   "15-git-setup.sh"
+  "18-op-login.sh"
   "20-clone-repos-gh.sh"
 )
 
