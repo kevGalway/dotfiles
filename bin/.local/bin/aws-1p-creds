@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REF="${1:-}" # e.g. op://Personal/aws-1p-creds
+
+if [[ -z "$REF" ]]; then
+  echo "usage: aws-1p-creds <op://Vault/Item>" >&2
+  exit 2
+fi
+
+for c in op jq; do
+  command -v "$c" >/dev/null || {
+    echo "missing $c" >&2
+    exit 1
+  }
+done
+
+# Ensure op session
+op whoami >/dev/null 2>&1 || op signin >/dev/null 2>&1
+
+# Read long-lived keys from 1Password
+AK="$(op read "$REF/Access Key ID")"
+SK="$(op read "$REF/Secret Access Key")"
+if [[ -z "${AK:-}" || -z "${SK:-}" ]]; then
+  echo "missing fields in $REF (need 'Access Key ID' and 'Secret Access Key')" >&2
+  exit 2
+fi
+
+# Emit the exact JSON schema AWS expects for credential_process
+jq -n --arg ak "$AK" --arg sk "$SK" '
+{
+  Version: 1,
+  AccessKeyId: $ak,
+  SecretAccessKey: $sk,
+  SessionToken: ""
+}'
