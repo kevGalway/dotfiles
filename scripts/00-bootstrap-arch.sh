@@ -12,7 +12,7 @@ if ! command -v pacman >/dev/null 2>&1 || [ ! -f /etc/arch-release ]; then
 fi
 
 echo "Installing base packages"
-sudo pacman -Syu --needed git stow tmux fish starship zoxide fzf ripgrep bat neovim reflector github-cli
+sudo pacman -Syu --needed git stow tmux jq fish starship zoxide fzf ripgrep bat neovim reflector github-cli
 
 echo "==> Refreshing mirrors with reflector"
 sudo reflector --country --age 48 --protocol https --sort rate --save /etc/pacman.d/mirrorlist || true

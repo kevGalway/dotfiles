@@ -5,14 +5,14 @@ ROOT_DIR="$(cd -- "$(dirname "$0")/.." && pwd)"
 
 steps=(
   "00-bootstrap-arch.sh"
-  "02-install-extra.sh"
-  "03-firewall.sh"
-  "05-prune-defaults.sh"
-  "10-stow.sh"
-  "12-mise.sh"
-  "15-git-setup.sh"
-  "18-op-login.sh"
-  "20-clone-repos-gh.sh"
+  "10-install-extra.sh"
+  "20-firewall.sh"
+  "30-prune-defaults.sh"
+  "40-stow.sh"
+  "50-mise.sh"
+  "60-op-login.sh"
+  "70-ssh-1password.sh"
+  "80-clone-repos-gh.sh"
 )
 
 echo "==> Running provisioning steps from: $ROOT_DIR/scripts"
