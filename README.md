@@ -13,7 +13,7 @@ This is built for me and my setup. No guarantees that it will work for others.
 - Install some dev tools via install-extra
 - Setup 1password + get working with cli for ssh keys, api, aws etc. 
 - Clone repos selectively.
-- TODO: configure base browser plugins (uBlock Origin, Firefox Containers, Password manager)
+- Setup Firefox dev edition, setup arkenfox and default good extensions for uBlock Origin, firefox containers and 1password extension
 
 
 
