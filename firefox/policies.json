@@ -2,6 +2,14 @@
   "policies": {
     "DisableTelemetry": true,
     "DisablePocket": true,
+    "DisableFirefoxStudies": true,
+    "HttpsOnlyMode": "force_enabled",
+    "EnableTrackingProtection": {
+      "Value": true,              // Strict
+      "Locked": true,
+      "Cryptomining": true,
+      "Fingerprinting": true
+    },
     "DNSOverHTTPS": {
       "Enabled": true,
       "Locked": false,
@@ -14,6 +22,13 @@
         "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi",
         "https://addons.mozilla.org/firefox/downloads/latest/multi-account-containers/latest.xpi"
       ]
+    },
+    "OfferToSaveLogins": false,
+    "PasswordManagerEnabled": false,
+    "SearchEngines": {
+      "Default": "DuckDuckGo",
+      "Remove": ["Google"],
+      "PreventInstalls": true
     }
   }
 }

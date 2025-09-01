@@ -29,43 +29,78 @@ fetch() {
 
 # Resolve Firefox Dev Edition profile dir (Name=dev-edition-default preferred)
 find_dev_profile() {
-  local p
-  if [[ -f "$PROFILES_INI" ]]; then
-    # 1) exact Name=dev-edition-default
-    p="$(awk -F= -v HOME="$HOME" '
-      /^\[Profile[0-9]+\]$/ {in=1; name=path=rel=""; next}
-      /^\[/ {in=0}
-      in && $1=="Name" {name=$2}
-      in && $1=="Path" {path=$2}
-      in && $1=="IsRelative" {rel=$2}
-      END { if (name=="dev-edition-default")
-              print (rel=="1" ? HOME"/.mozilla/firefox/"path : path) }' "$PROFILES_INI")"
-    [[ -n "${p:-}" && -d "$p" ]] && {
-      echo "$p"
-      return
-    }
+  local best="" any="" in=0 name="" path="" rel=""
+  local ini="$PROFILES_INI"
 
-    # 2) any Name matching dev-edition-default
-    p="$(awk -F= -v HOME="$HOME" '
-      /^\[Profile[0-9]+\]$/ {in=1; name=path=rel=""; next}
-      /^\[/ {in=0}
-      in && $1=="Name" {name=$2}
-      in && $1=="Path" {path=$2}
-      in && $1=="IsRelative" {rel=$2}
-      { if (in && name ~ /dev-edition-default/) {
-          print (rel=="1" ? HOME"/.mozilla/firefox/"path : path); exit
-        } }' "$PROFILES_INI")"
-    [[ -n "${p:-}" && -d "$p" ]] && {
-      echo "$p"
-      return
-    }
+  [[ -f "$ini" ]] || return 1
+
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    case "$line" in
+    "[Profile"*[0-9]"]")
+      # starting a new profile section — reset fields
+      in=1
+      name=""
+      path=""
+      rel=""
+      ;;
+    "["*"]")
+      # leaving a profile section
+      in=0
+      ;;
+    Name=*)
+      [[ $in -eq 1 ]] && name="${line#Name=}"
+      ;;
+    Path=*)
+      [[ $in -eq 1 ]] && path="${line#Path=}"
+      ;;
+    IsRelative=*)
+      [[ $in -eq 1 ]] && rel="${line#IsRelative=}"
+      ;;
+    esac
+
+    # As soon as we have name+path+rel inside a section, consider it
+    if [[ $in -eq 1 && -n $name && -n $path && -n $rel ]]; then
+      local full
+      if [[ "$rel" == "1" ]]; then
+        full="$HOME/.mozilla/firefox/$path"
+      else
+        full="$path"
+      fi
+
+      if [[ -d "$full" ]]; then
+        # exact preferred match
+        if [[ "$name" == "dev-edition-default" ]]; then
+          best="$full"
+          break
+        fi
+        # fallback: anything containing dev-edition-default
+        if [[ -z "$any" && "$name" == *dev-edition-default* ]]; then
+          any="$full"
+        fi
+      fi
+
+      # reset so we don’t reuse for the next profile block
+      name=""
+      path=""
+      rel=""
+    fi
+  done <"$ini"
+
+  if [[ -n "$best" ]]; then
+    printf '%s\n' "$best"
+    return 0
+  fi
+  if [[ -n "$any" ]]; then
+    printf '%s\n' "$any"
+    return 0
   fi
 
-  # 3) glob fallback
-  p="$(ls -d "$HOME"/.mozilla/firefox/*.dev-edition-default* 2>/dev/null | head -n1 || true)"
-  [[ -n "${p:-}" && -d "$p" ]] && {
-    echo "$p"
-    return
+  # final glob fallback
+  local guess
+  guess="$(ls -d "$HOME"/.mozilla/firefox/*.dev-edition-default* 2>/dev/null | head -n1 || true)"
+  [[ -n "$guess" && -d "$guess" ]] && {
+    printf '%s\n' "$guess"
+    return 0
   }
 
   return 1
