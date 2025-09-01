@@ -2,6 +2,13 @@
   "policies": {
     "DisableTelemetry": true,
     "DisablePocket": true,
+    "DNSOverHTTPS": {
+      "Enabled": true,
+      "Locked": false,
+      "ProviderURL": "https://mozilla.cloudflare-dns.com/dns-query",
+      "BootstrapAddress": "1.1.1.1",
+      "ExcludedDomains": ["localhost", "local"]
+    },
     "Extensions": {
       "Install": [
         "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi",
