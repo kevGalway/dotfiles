@@ -5,7 +5,7 @@
     "DisableFirefoxStudies": true,
     "HttpsOnlyMode": "force_enabled",
     "EnableTrackingProtection": {
-      "Value": true,              // Strict
+      "Value": true,
       "Locked": true,
       "Cryptomining": true,
       "Fingerprinting": true
