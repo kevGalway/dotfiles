@@ -11,6 +11,7 @@ steps=(
   "40-stow.sh"
   "50-mise.sh"
   "60-op-login.sh"
+  "65-firefox-setup"
   "70-ssh-1password.sh"
   "80-clone-repos-gh.sh"
 )
