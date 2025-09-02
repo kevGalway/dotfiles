@@ -166,6 +166,12 @@ main() {
 
   install_policies_dev
 
+  TEMPLATE_CONTAINERS_JSON="$REPO_ROOT/firefox/containers.json"
+  if [[ -f "$TEMPLATE_CONTAINERS_JSON" ]]; then
+    log "Seeding containers.json"
+    install -m 0644 "$TEMPLATE_CONTAINERS_JSON" "$profile/containers.json"
+  fi
+
   echo
   echo "✓ Arkenfox applied to: $profile"
   echo "   - Restart Firefox Developer Edition (fully quit, then open)."

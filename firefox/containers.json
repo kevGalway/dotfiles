@@ -1,0 +1,9 @@
+{
+  "version": 4,
+  "identities": [
+    { "userContextId": 1, "public": true, "name": "Personal", "color": "blue",  "icon": "chill" },
+    { "userContextId": 2, "public": true, "name": "Dev",      "color": "green", "icon": "tree" },
+    { "userContextId": 3, "public": true, "name": "Prod",     "color": "red",   "icon": "briefcase" },
+    { "userContextId": 4, "public": true, "name": "Other",    "color": "pink",  "icon": "dollar" }
+  ]
+}
