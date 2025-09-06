@@ -24,4 +24,7 @@ cd ~/repos/dotfiles
 ./scripts/run-all.sh
 ```
 
+### TODO Items
+globally installed npm packages
+npm install -g wrangler
 
