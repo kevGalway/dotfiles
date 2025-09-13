@@ -24,8 +24,3 @@ cd ~/repos/dotfiles
 ./scripts/run-all.sh
 ```
 
-### TODO Items
-globally installed npm packages
-npm install -g wrangler
-
-between 6 and 7, open and sign into 1password on desktop and terminal
