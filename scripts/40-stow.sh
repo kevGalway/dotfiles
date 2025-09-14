@@ -2,7 +2,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-PKGS=(fish tmux alacritty starship aws bin)
+PKGS=(fish tmux alacritty starship aws bin waybar)
 
 read -rp "Apply these symlinks? [y/N] " ok
 if [[ "$ok" =~ ^[Yy]$ ]]; then
