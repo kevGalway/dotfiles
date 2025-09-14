@@ -3,3 +3,4 @@ firefox-developer-edition
 
 # CLI tools
 aws-cli-v2
+bind
