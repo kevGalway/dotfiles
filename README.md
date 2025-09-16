@@ -24,3 +24,7 @@ cd ~/repos/dotfiles
 ./scripts/run-all.sh
 ```
 
+
+#### Todo. 
+Install from Aur
+protonmail-bridge

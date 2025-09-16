@@ -1,2 +1,5 @@
 signal-desktop
 spotify
+obs-studio
+kdenlive
+libreoffice-fresh

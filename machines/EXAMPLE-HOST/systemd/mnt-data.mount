@@ -1,0 +1,14 @@
+[Unit]
+Description=Data disk mounted at /mnt/data
+After=local-fs-pre.target
+Requires=local-fs-pre.target
+
+[Mount]
+# Replace with your disk UUID path. Find with: sudo blkid
+What=/dev/disk/by-uuid/00000000-0000-0000-0000-000000000000
+Where=/mnt/data
+Type=ext4
+Options=nofail,noatime
+
+[Install]
+WantedBy=multi-user.target
