@@ -5,3 +5,8 @@ firefox-developer-edition
 aws-cli-v2
 bind
 traceroute
+openresolv
+
+# For file transfer from android
+gvfs-mtp 
+mtpfs
