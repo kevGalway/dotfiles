@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+QUERY="${1:-}" # e.g. "aws-prod" or an item UUID
+TTL="${2:-3600}"
+
+if [[ -z "$QUERY" ]]; then
+  echo "usage: aws-bw-creds <bitwarden item name or id> [ttl_seconds]" >&2
+  exit 2
+fi
+
+need() { command -v "$1" >/dev/null 2>&1 || {
+  echo "missing $1" >&2
+  exit 1
+}; }
+need jq
+need bw
+
+# --- Ensure vault is unlocked ---
+bw_is_unlocked() { bw status 2>/dev/null | jq -e '.status=="unlocked"' >/dev/null; }
+
+if ! bw_is_unlocked; then
+  if [[ -t 0 && -t 2 ]]; then
+    # TTY available → prompt interactively
+    export BW_SESSION="$(bw unlock --raw)"
+  else
+    echo "Bitwarden vault is locked and no TTY is available to prompt.
+Run:  bw login && export BW_SESSION=\$(bw unlock --raw)
+(or unlock via a wrapper before calling aws)" >&2
+    exit 3
+  fi
+fi
+# --- end unlock guard ---
+
+# Fetch item by id or by searchable name
+ITEM_JSON="$(bw get item "$QUERY" 2>/dev/null || true)"
+if [[ -z "$ITEM_JSON" ]]; then
+  ID="$(bw list items --search "$QUERY" | jq -r '.[0].id // empty')"
+  [[ -n "$ID" ]] || {
+    echo "Bitwarden item not found: $QUERY" >&2
+    exit 4
+  }
+  ITEM_JSON="$(bw get item "$ID")"
+fi
+
+# Helper to read a custom field by name
+get_field() {
+  local key="$1"
+  echo "$ITEM_JSON" | jq -r --arg k "$key" '
+    (.fields // []) | map(select((.name // "") == $k)) | .[0].value // empty'
+}
+
+# Prefer custom fields; fall back to login.username/password
+AK="$(get_field 'Access Key ID')"
+[[ -n "$AK" ]] || AK="$(get_field 'access_key_id')"
+SK="$(get_field 'Secret Access Key')"
+[[ -n "$SK" ]] || SK="$(get_field 'secret_access_key')"
+
+if [[ -z "$AK" || -z "$SK" ]]; then
+  AK="$(echo "$ITEM_JSON" | jq -r '.login.username // empty')"
+  SK="$(echo "$ITEM_JSON" | jq -r '.login.password // empty')"
+fi
+
+if [[ -z "$AK" || -z "$SK" ]]; then
+  echo "Missing AWS keys in BW item (need AKID and Secret). Checked custom fields and login fields." >&2
+  exit 5
+fi
+
+# Optional session token custom field
+ST="$(get_field 'session_token')"
+
+# Compute an expiration even for long-lived keys
+if [[ "$TTL" -gt 60 ]]; then
+  EXP="$(date -u -d "+$((TTL - 60)) seconds" --iso-8601=seconds 2>/dev/null || date -u +"%Y-%m-%dT%H:%M:%SZ")"
+else
+  EXP="$(date -u -d "+60 seconds" --iso-8601=seconds 2>/dev/null || date -u +"%Y-%m-%dT%H:%M:%SZ")"
+fi
+
+# Emit ONLY the JSON expected by credential_process
+jq -n --arg a "$AK" --arg s "$SK" --arg t "${ST:-}" --arg e "$EXP" \
+  '{Version:1, AccessKeyId:$a, SecretAccessKey:$s, SessionToken:$t, Expiration:$e}'
